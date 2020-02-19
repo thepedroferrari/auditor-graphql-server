@@ -1,10 +1,25 @@
 const { ApolloServer, gql } = require("apollo-server");
 
 const typeDefs = gql`
+  enum Status {
+    WATCHED
+    INTERESTED
+    NOT_INTERESTED
+    UNKNOWN
+  }
+
+  type Actor {
+    id: ID
+    name: String
+  }
+
   type Movie {
-    title: String
+    id: ID!
+    actor: Actor
+    title: String!
     releaseDate: String
     rating: Int
+    status: Status
   }
 
   type Query {
@@ -34,3 +49,7 @@ const resolvers = {
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
+
+server.listen().then(({ url }) => {
+  console.log(`Server started at: ${url}`);
+})
