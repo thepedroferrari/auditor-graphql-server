@@ -6,7 +6,12 @@ const typeDefs = gql`
     releaseDate: String
     rating: Int
   }
-`
+
+  type Query {
+    movies: [Movie]
+  }
+`;
+
 
 const movies = [
   {
@@ -19,4 +24,12 @@ const movies = [
     releaseDate: "10-10-1983",
     rating: 5
   }
-]
+];
+
+const resolvers = {
+  Query: {
+    movies: () => {
+      return movies;
+    }
+  }
+};
