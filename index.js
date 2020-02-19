@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql } = require("apollo-server");
 
 const typeDefs = gql`
   type Movie {
@@ -11,7 +11,6 @@ const typeDefs = gql`
     movies: [Movie]
   }
 `;
-
 
 const movies = [
   {
@@ -33,3 +32,5 @@ const resolvers = {
     }
   }
 };
+
+const server = new ApolloServer({ typeDefs, resolvers });
