@@ -45,12 +45,9 @@ const movies = [
 
 const resolvers = {
   Query: {
-    movies: () => {
-      return movies;
-    },
-    movie: () => {
-      return movies[0]
-    }
+    movies: () => movies,
+    movie: (obj, { id }, context, info) =>
+      movies.find(movie => movie.id === id)
   }
 };
 
