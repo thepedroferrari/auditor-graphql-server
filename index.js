@@ -20,7 +20,7 @@ const typeDefs = gql`
 
   type Movie {
     id: ID!
-    actor: [Actor]
+    actors: [Actor]
     title: String!
     releaseDate: Date
     rating: Int
@@ -33,18 +33,39 @@ const typeDefs = gql`
   }
 `;
 
+const actors = [
+  {
+    id: "gordon",
+    name: "Gordon Liu Kenga"
+  },
+  {
+    id: "jackie",
+    name: "Jackie Chan"
+  }
+];
+
 const movies = [
   {
     id: "dasadsadsasd",
     title: "5 Deadly Venoms",
     releaseDate: new Date("12-10-1983"),
-    rating: 5
+    rating: 5,
+    actors: [
+      {
+        id: "jackie"
+      }
+    ]
   },
   {
     id: "dddd",
     title: "36th Chamber",
     releaseDate: new Date("10-10-1983"),
-    rating: 5
+    rating: 5,
+    actors: [
+      {
+        id: "gordon"
+      }
+    ]
   }
 ];
 
@@ -53,6 +74,17 @@ const resolvers = {
     movies: () => movies,
     movie: (obj, { id }, context, info) => movies.find(movie => movie.id === id)
   },
+
+  Movie: {
+    actors: (obj, arg, context) => {
+      const actorIds = obj.actors.map(actor => actor.id)
+      const filteredActors = actors.filter(actor =>
+        actorIds.includes(actor.id)
+      );
+      return filteredActors;
+    }
+  },
+
   Date: new GraphQLScalarType({
     name: "Date",
     description: "It's a new date",
