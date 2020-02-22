@@ -31,6 +31,19 @@ const typeDefs = gql`
     movies: [Movie]
     movie(id: ID): Movie
   }
+
+  input MovieInput {
+    id: ID
+    title: String
+    releaseDate: Date
+    ratting: Int
+    status: Status
+    # actor: [Actor]
+  }
+
+  type Mutation {
+    addMovie(movie: MovieInput): [Movie]
+  }
 `;
 
 const actors = [
@@ -76,12 +89,24 @@ const resolvers = {
   },
 
   Movie: {
-    actors: (obj, arg, context) => {
-      const actorIds = obj.actors.map(actor => actor.id)
+    actors: (obj, args, context) => {
+      const actorIds = obj.actors.map(actor => actor.id);
       const filteredActors = actors.filter(actor =>
         actorIds.includes(actor.id)
       );
       return filteredActors;
+    }
+  },
+
+  Mutation: {
+    addMovie: (obj, { movie }, context) => {
+      const newMoviesList = [
+        // pull data from database
+        ...movies,
+        movie
+      ];
+      // update database
+      return newMoviesList;
     }
   },
 
@@ -98,7 +123,7 @@ const resolvers = {
     },
     parseLiteral(ast) {
       if (ast.kind === Kind.INT) {
-        return new Date(ast.value)
+        return new Date(ast.value);
       }
       return null;
     }
