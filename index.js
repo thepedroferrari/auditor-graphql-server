@@ -2,7 +2,6 @@ const { ApolloServer, gql } = require("apollo-server");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
 
-
 const typeDefs = gql`
   scalar Date
 
@@ -32,13 +31,18 @@ const typeDefs = gql`
     movie(id: ID): Movie
   }
 
+  input ActorInput {
+    id: ID
+    name: String
+  }
+
   input MovieInput {
     id: ID
     title: String
     releaseDate: Date
     ratting: Int
     status: Status
-    # actor: [Actor]
+    actors: [ActorInput]
   }
 
   type Mutation {
@@ -99,15 +103,18 @@ const resolvers = {
   },
 
   Mutation: {
-    addMovie: (obj, { movie }, context) => {
-      const newMoviesList = [
-        // pull data from database
-        ...movies,
-        movie
-      ];
+    addMovie: (obj, { movie }, { userId }) => {
+      if (userId === "user IDENTIFICASTIONSNSNAISD") {
+        const newMoviesList = [
+          // pull data from database
+          ...movies,
+          movie
+        ];
+        // update database
+        return newMoviesList;
+      }
 
-      // update database
-      return newMoviesList;
+      return movies;
     }
   },
 
@@ -135,11 +142,21 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   introspection: true,
-  playground: true
+  playground: true,
+  context: ({ req }) => {
+    const fakeUser = {
+      userId: "user IDENTIFICASTIONSNSNAISD"
+    };
+    return {
+      ...fakeUser
+    };
+  }
 });
 
-server.listen({
-  port: process.env.PORT || 4000
-}).then(({ url }) => {
-  console.log(`Server started at: ${url}`);
-})
+server
+  .listen({
+    port: process.env.PORT || 4000
+  })
+  .then(({ url }) => {
+    console.log(`Server started at: ${url}`);
+  });
