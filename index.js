@@ -105,6 +105,7 @@ const resolvers = {
         ...movies,
         movie
       ];
+
       // update database
       return newMoviesList;
     }
