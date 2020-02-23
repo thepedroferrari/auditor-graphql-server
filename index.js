@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql, PubSub } = require("apollo-server");
 const dotenv = require("dotenv");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
@@ -73,6 +73,10 @@ const typeDefs = gql`
   type Mutation {
     addMovie(movie: MovieInput): [Movie]
   }
+
+  type Subscription {
+    movieAdded: Movie
+  }
 `;
 
 const actors = [
@@ -111,7 +115,16 @@ const movies = [
   }
 ];
 
+const pubsub = new PubSub()
+const MOVIE_ADDED = 'MOVIE_ADDED'
+
 const resolvers = {
+  Subscription: {
+    movieAdded: {
+      subscribe: () => pubsub.asyncIterator([MOVIE_ADDED])
+    }
+  },
+
   Query: {
     movies: async () => {
       try {
@@ -133,25 +146,29 @@ const resolvers = {
     }
   },
 
-  Movie: {
-    actors: (obj, args, context) => {
-      const actorIds = obj.actors.map(actor => actor.id);
-      const filteredActors = actors.filter(actor =>
-        actorIds.includes(actor.id)
-      );
-      return filteredActors;
-    }
-  },
+  // Movie: {
+  //   actors: (obj, args, context) => {
+  //     const actorIds = obj.actors.map(actor => actor.id);
+  //     const filteredActors = actors.filter(actor =>
+  //       actorIds.includes(actor.id)
+  //     );
+  //     return filteredActors;
+  //   }
+  // },
 
   Mutation: {
     addMovie: async (obj, { movie }, { userId }) => {
       try {
         if (userId === "user IDENTIFICASTIONSNSNAISD") {
           // pull data from database
-          await Movie.create({
+          const newMovie = await Movie.create({
             ...movie
           });
-          // update database
+
+          // add new movie
+          pubsub.publish(MOVIE_ADDED, { movieAdded: newMovie})
+
+          // show results
           const allMovies = await Movie.find();
           return allMovies;
         }
