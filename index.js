@@ -9,8 +9,6 @@ mongoose.connect(
   `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0-tpkgr.azure.mongodb.net/test?retryWrites=true&w=majority`,
   { useNewUrlParser: true }
 );
-
-
 const db = mongoose.connection;
 
 // gql`` parses the string into an Abstract Syntax Tree
