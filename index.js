@@ -11,6 +11,16 @@ mongoose.connect(
 );
 const db = mongoose.connection;
 
+const movieSchema = new mongoose.Schema({
+  actorsIds: [String],
+  title: String,
+  releaseDate: Date,
+  rating: Number,
+  status: String
+});
+
+const Movie = mongoose.model("Movie", movieSchema);
+
 // gql`` parses the string into an Abstract Syntax Tree
 const typeDefs = gql`
   fragment Meta on Movie {
@@ -103,8 +113,24 @@ const movies = [
 
 const resolvers = {
   Query: {
-    movies: () => movies,
-    movie: (obj, { id }, context, info) => movies.find(movie => movie.id === id)
+    movies: async () => {
+      try {
+        const allMovies = await Movie.find();
+        return allMovies;
+      } catch (error) {
+        console.log("Query error:", error);
+        return [];
+      }
+    },
+    movie: async (obj, { id }) => {
+      try {
+        const foundMovie = await Movie.findById(id);
+        return foundMovie;
+      } catch (error) {
+        console.log("error:", error);
+        return {};
+      }
+    }
   },
 
   Movie: {
@@ -118,18 +144,25 @@ const resolvers = {
   },
 
   Mutation: {
-    addMovie: (obj, { movie }, { userId }) => {
-      if (userId === "user IDENTIFICASTIONSNSNAISD") {
-        const newMoviesList = [
+    addMovie: async (obj, { movie }, { userId }) => {
+      try {
+        if (userId === "user IDENTIFICASTIONSNSNAISD") {
           // pull data from database
-          ...movies,
-          movie
-        ];
-        // update database
-        return newMoviesList;
-      }
+          await Movie.create({
+            ...movie
+          });
+          // update database
+          const allMovies = await Movie.find();
+          return allMovies;
+        }
 
-      return movies;
+        return movies;
+      } catch (e) {
+        console.log("e:", e);
+        return [];
+      } finally {
+        console.log("End of Mutation");
+      }
     }
   },
 
