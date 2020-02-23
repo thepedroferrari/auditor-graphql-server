@@ -1,6 +1,9 @@
 const { ApolloServer, gql } = require("apollo-server");
+const dotenv = require("dotenv");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
+
+dotenv.config();
 
 const typeDefs = gql`
   fragment Meta on Movie {
@@ -149,6 +152,7 @@ const server = new ApolloServer({
   introspection: true,
   playground: true,
   context: ({ req }) => {
+    console.log('FAKE DATA:', process.env.FAKE_DATA)
     const fakeUser = {
       userId: "user IDENTIFICASTIONSNSNAISD"
     };
