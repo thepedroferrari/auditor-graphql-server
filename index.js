@@ -3,6 +3,11 @@ const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
 
 const typeDefs = gql`
+  fragment Meta on Movie {
+    releaseDate
+    rating
+  }
+
   scalar Date
 
   enum Status {
@@ -40,7 +45,7 @@ const typeDefs = gql`
     id: ID
     title: String
     releaseDate: Date
-    ratting: Int
+    rating: Int
     status: Status
     actors: [ActorInput]
   }
