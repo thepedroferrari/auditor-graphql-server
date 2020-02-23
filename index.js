@@ -2,9 +2,18 @@ const { ApolloServer, gql } = require("apollo-server");
 const dotenv = require("dotenv");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
+const mongoose = require("mongoose");
 
 dotenv.config();
+mongoose.connect(
+  `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0-tpkgr.azure.mongodb.net/test?retryWrites=true&w=majority`,
+  { useNewUrlParser: true }
+);
 
+
+const db = mongoose.connection;
+
+// gql`` parses the string into an Abstract Syntax Tree
 const typeDefs = gql`
   fragment Meta on Movie {
     releaseDate
@@ -152,7 +161,6 @@ const server = new ApolloServer({
   introspection: true,
   playground: true,
   context: ({ req }) => {
-    console.log('FAKE DATA:', process.env.FAKE_DATA)
     const fakeUser = {
       userId: "user IDENTIFICASTIONSNSNAISD"
     };
@@ -162,10 +170,14 @@ const server = new ApolloServer({
   }
 });
 
-server
-  .listen({
-    port: process.env.PORT || 4000
-  })
-  .then(({ url }) => {
-    console.log(`Server started at: ${url}`);
-  });
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+  console.log("✅ Connected to MongoDB ✅");
+  server
+    .listen({
+      port: process.env.PORT || 4000
+    })
+    .then(({ url }) => {
+      console.log(`Server started at: ${url}`);
+    });
+});
